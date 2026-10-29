@@ -1,0 +1,954 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tetodex - Kasane Teto Pokédex</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Orbitron & Rajdhani -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        teto: {
+                            red: '#e60033',
+                            darkred: '#80001c',
+                            crimson: '#b30024',
+                            black: '#0d0d0d',
+                            glass: 'rgba(20, 5, 10, 0.75)',
+                            glassCard: 'rgba(30, 8, 15, 0.65)',
+                            border: 'rgba(230, 0, 51, 0.35)'
+                        }
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        rajdhani: ['Rajdhani', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: #0d0d0d;
+            background-image: url('https://preview.redd.it/does-someone-have-a-good-teto-wallpaper-for-pc-v0-3ejvob6zbtug1.jpeg?width=2560&format=pjpg&auto=webp&s=32f1813dcfb5d74a32a94b71948a438af9fcef78');
+            background-attachment: fixed;
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            color: #ffffff;
+        }
+
+        /* Fallback / Custom style overlay for Kasane Teto Wallpaper */
+        .bg-overlay {
+            background: linear-gradient(135deg, rgba(13,13,13,0.75) 0%, rgba(128,0,28,0.35) 50%, rgba(13,13,13,0.8) 100%);
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(13, 13, 13, 0.8);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e60033;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #ff3366;
+        }
+
+        /* Neon Glow Effect */
+        .neon-glow-red {
+            text-shadow: 0 0 8px rgba(230, 0, 51, 0.8), 0 0 16px rgba(230, 0, 51, 0.5);
+        }
+
+        .neon-border {
+            box-shadow: 0 0 10px rgba(230, 0, 51, 0.3), inset 0 0 10px rgba(230, 0, 51, 0.2);
+        }
+
+        .neon-border-hover:hover {
+            box-shadow: 0 0 20px rgba(230, 0, 51, 0.7), inset 0 0 15px rgba(230, 0, 51, 0.4);
+            border-color: #e60033;
+        }
+
+        /* Type Badges Colors */
+        .type-normal { background: #A8A878; color: #000; }
+        .type-fire { background: #F08030; color: #fff; }
+        .type-water { background: #6890F0; color: #fff; }
+        .type-grass { background: #78C850; color: #000; }
+        .type-electric { background: #F8D030; color: #000; }
+        .type-ice { background: #98D8D8; color: #000; }
+        .type-fighting { background: #C03028; color: #fff; }
+        .type-poison { background: #A040A0; color: #fff; }
+        .type-ground { background: #E0C068; color: #000; }
+        .type-flying { background: #A890F0; color: #fff; }
+        .type-psychic { background: #F85888; color: #fff; }
+        .type-bug { background: #A8B820; color: #000; }
+        .type-rock { background: #B8A038; color: #fff; }
+        .type-ghost { background: #705898; color: #fff; }
+        .type-dragon { background: #7038F8; color: #fff; }
+        .type-steel { background: #B8B8D0; color: #000; }
+        .type-fairy { background: #EE99AC; color: #000; }
+        .type-dark { background: #705848; color: #fff; }
+
+        /* Card animation */
+        .card-hover {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .card-hover:hover {
+            transform: translateY(-6px) scale(1.02);
+        }
+    </style>
+</head>
+<body class="relative min-h-screen pb-12 flex flex-col">
+
+    <!-- Fundo de Overlay com Gradiente Temático -->
+    <div class="bg-overlay"></div>
+
+    <!-- HEADER / BARRA SUPERIOR -->
+    <header class="sticky top-0 z-30 backdrop-blur-md bg-teto-glass border-b border-teto-border shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+            
+            <!-- LOGO / TÍTULO -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="resetSearch()">
+                <div class="relative w-12 h-12 flex items-center justify-center rounded-full bg-teto-darkred border-2 border-teto-red shadow-lg overflow-hidden group">
+                    <i class="fa-solid fa-compact-disc text-teto-red text-2xl group-hover:rotate-180 transition-transform duration-700"></i>
+                    <span class="absolute inset-0 bg-teto-red opacity-20 animate-pulse"></span>
+                </div>
+                <div>
+                    <h1 class="font-orbitron text-3xl font-black tracking-wider text-white neon-glow-red flex items-center gap-2">
+                        TETO<span class="text-teto-red">DEX</span>
+                        <span class="text-xs font-normal tracking-normal px-2 py-0.5 rounded bg-teto-red/30 border border-teto-red text-red-200">v2.0</span>
+                    </h1>
+                    <p class="text-xs text-red-300/80 font-rajdhani font-semibold uppercase tracking-widest">Kasane Teto Pokédex Protocol</p>
+                </div>
+            </div>
+
+            <!-- BARRA DE PESQUISA & FILTROS -->
+            <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+                <div class="relative w-full sm:w-80">
+                    <input type="text" id="search-input" placeholder="Buscar por Nome ou Número ID..." 
+                        class="w-full pl-10 pr-4 py-2 bg-black/60 border border-teto-border rounded-xl text-white placeholder-red-300/50 focus:outline-none focus:border-teto-red focus:ring-1 focus:ring-teto-red transition-all font-rajdhani text-lg">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-teto-red"></i>
+                    <button id="clear-search" onclick="clearSearch()" class="hidden absolute right-3 top-3 text-gray-400 hover:text-white">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <select id="type-filter" onchange="filterByType()" class="w-full sm:w-auto px-4 py-2 bg-black/60 border border-teto-border rounded-xl text-white focus:outline-none focus:border-teto-red transition-all font-rajdhani text-lg cursor-pointer">
+                    <option value="all">Todos os Tipos</option>
+                    <option value="normal">Normal</option>
+                    <option value="fire">Fogo (Fire)</option>
+                    <option value="water">Água (Water)</option>
+                    <option value="grass">Planta (Grass)</option>
+                    <option value="electric">Elétrico (Electric)</option>
+                    <option value="ice">Gelo (Ice)</option>
+                    <option value="fighting">Lutador (Fighting)</option>
+                    <option value="poison">Veneno (Poison)</option>
+                    <option value="ground">Terrestre (Ground)</option>
+                    <option value="flying">Voador (Flying)</option>
+                    <option value="psychic">Psíquico (Psychic)</option>
+                    <option value="bug">Inseto (Bug)</option>
+                    <option value="rock">Pedra (Rock)</option>
+                    <option value="ghost">Fantasma (Ghost)</option>
+                    <option value="dragon">Dragão (Dragon)</option>
+                    <option value="steel">Aço (Steel)</option>
+                    <option value="fairy">Fada (Fairy)</option>
+                    <option value="dark">Sombrio (Dark)</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="max-w-7xl mx-auto px-4 py-8 flex-grow w-full">
+        
+        <!-- ESTASTÍDICAS / BANNER SUPERIOR -->
+        <div class="mb-8 p-4 rounded-2xl bg-teto-glass backdrop-blur-md border border-teto-border flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-microchip text-teto-red text-xl"></i>
+                <span class="text-gray-300 font-semibold">Total de Pokémon Carregados: <strong id="loaded-count" class="text-teto-red font-orbitron">0</strong></span>
+            </div>
+            <div class="flex items-center gap-2 text-xs text-red-300/70">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>Clique em qualquer Pokémon para visualizar status completos, descrições e lista de ataques!</span>
+            </div>
+        </div>
+
+        <!-- GRID DE POKÉMON -->
+        <div id="pokemon-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+    <!-- PLAYER DE MÚSICA POP-UP KASANE TETO (V2.0 - SPOTIFY AUDIO STYLE) -->
+    <div id="teto-music-player" class="fixed bottom-5 right-5 z-40 transition-all duration-300">
+        <!-- Player Expandido -->
+        <div id="player-card" class="bg-teto-glass border-2 border-teto-red rounded-2xl p-4 w-72 md:w-80 shadow-2xl backdrop-blur-xl neon-border relative overflow-hidden">
+            <!-- Efeito de luz decorativa no fundo -->
+            <div class="absolute -right-8 -top-8 w-24 h-24 bg-teto-red/20 rounded-full blur-xl pointer-events-none"></div>
+
+            <!-- Cabeçalho do Player -->
+            <div class="flex items-center justify-between pb-2 mb-3 border-b border-teto-border/50">
+                <div class="flex items-center gap-2">
+                    <i class="fa-brands fa-spotify text-teto-red text-lg animate-pulse"></i>
+                    <span class="font-orbitron text-xs font-bold tracking-wider text-white">TETO AUDIO PLAYER</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="toggleMinimizePlayer()" class="text-gray-400 hover:text-teto-red transition-colors text-xs p-1">
+                        <i class="fa-solid fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Capa da Música & Informações -->
+            <div class="flex items-center gap-3 mb-3">
+                <div class="relative w-14 h-14 rounded-xl overflow-hidden border border-teto-border bg-black/60 flex-shrink-0">
+                    <img id="track-cover" src="https://placehold.co/150/80001c/ffffff?text=TETO" alt="Album Cover" class="w-full h-full object-cover">
+                    <div id="vinyl-spin" class="absolute inset-0 bg-black/40 rounded-full border border-teto-red/50 animate-spin opacity-0 transition-opacity" style="animation-duration: 4s;"></div>
+                </div>
+                <div class="overflow-hidden flex-grow">
+                    <h4 id="track-title" class="font-orbitron font-bold text-sm text-white truncate">Override</h4>
+                    <p id="track-artist" class="text-xs text-teto-red font-rajdhani font-semibold truncate">Kasane Teto (CastStation)</p>
+                </div>
+            </div>
+
+            <!-- Audio Element Nao Visivel -->
+            <audio id="audio-element" preload="metadata"></audio>
+
+            <!-- Barra de Progresso do Audio -->
+            <div class="mb-3">
+                <input type="range" id="seek-bar" value="0" min="0" max="100" class="w-full h-1.5 bg-black/60 rounded-lg appearance-none cursor-pointer accent-teto-red">
+                <div class="flex justify-between text-[10px] text-gray-400 font-orbitron mt-1">
+                    <span id="current-time">0:00</span>
+                    <span id="duration-time">0:00</span>
+                </div>
+            </div>
+
+            <!-- Controles estilo Spotify -->
+            <div class="flex items-center justify-between">
+                <!-- Volume -->
+                <div class="flex items-center gap-1.5 w-20">
+                    <button id="mute-btn" onclick="toggleMute()" class="text-gray-400 hover:text-white text-xs">
+                        <i id="volume-icon" class="fa-solid fa-volume-high"></i>
+                    </button>
+                    <input type="range" id="volume-bar" value="80" min="0" max="100" class="w-full h-1 bg-black/60 rounded-lg appearance-none cursor-pointer accent-teto-red">
+                </div>
+
+                <!-- Botões de Troca de Faixa / Play -->
+                <div class="flex items-center gap-3">
+                    <button onclick="prevTrack()" class="text-gray-300 hover:text-teto-red text-sm transition-colors">
+                        <i class="fa-solid fa-backward-step"></i>
+                    </button>
+                    <button id="play-pause-btn" onclick="togglePlay()" class="w-10 h-10 rounded-full bg-teto-red text-white flex items-center justify-center text-lg shadow-lg hover:scale-105 transition-transform">
+                        <i id="play-icon" class="fa-solid fa-play ml-0.5"></i>
+                    </button>
+                    <button onclick="nextTrack()" class="text-gray-300 hover:text-teto-red text-sm transition-colors">
+                        <i class="fa-solid fa-forward-step"></i>
+                    </button>
+                </div>
+
+                <!-- Indicador de Faixas -->
+                <span id="track-index-display" class="text-[10px] font-orbitron text-teto-red/80 font-bold">1/4</span>
+            </div>
+        </div>
+
+        <!-- Botão Minimizado -->
+        <button id="player-minimized" onclick="toggleMinimizePlayer()" class="hidden bg-teto-glass border-2 border-teto-red rounded-full p-3 shadow-xl backdrop-blur-md hover:scale-110 transition-all flex items-center gap-2 group">
+            <i class="fa-solid fa-compact-disc text-teto-red text-2xl group-hover:rotate-180 transition-transform duration-700"></i>
+            <span class="font-orbitron text-xs text-white pr-2 font-bold">TETO PLAYER</span>
+        </button>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Pokédex State Variables
+        const POKEAPI_BASE = 'https://pokeapi.co/api/v2';
+        const LIMIT = 30;
+        let offset = 0;
+        let isLoading = false;
+        let allLoadedPokemon = [];
+        let isShinyMode = false;
+        let currentSpeciesData = null;
+        let currentVarietyData = null;
+        let spriteUrls = [];
+        let currentSpriteIndex = 0;
+
+        // DOM Elements
+        let modal, searchInput, clearSearchBtn, loadingContainer, grid, loadedCount, loadMoreBtn;
+
+        // Player de Música Spotify-Style State
+        const tetoPlaylist = [
+            {
+                title: 'Override (オーバーライド)',
+                artist: 'Kasane Teto (Yoshida Yasei)',
+                cover: 'https://images.fineartamerica.com/images/artworkimages/medium/3/kasane-teto-vocaloid-anime-pop-art-transparent.png',
+                src: 'https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=synthwave-vocal-groove-112199.mp3'
+            },
+            {
+                title: 'Mesmerizer (メズマライザー)',
+                artist: 'Kasane Teto & Hatsune Miku',
+                cover: 'https://placehold.co/150/e60033/ffffff?text=Mesmerizer',
+                src: 'https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=cyberpunk-vocal-beat-18683.mp3'
+            },
+            {
+                title: 'Kasane Territory',
+                artist: 'Kasane Teto (Kero 9 Destiny)',
+                cover: 'https://placehold.co/150/80001c/ffffff?text=Territory',
+                src: 'https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a1668e.mp3?filename=fast-jp-synth-10118.mp3'
+            },
+            {
+                title: 'Tetoris (テトリス)',
+                artist: 'Kasane Teto Original',
+                cover: 'https://placehold.co/150/b30024/ffffff?text=Tetoris',
+                src: 'https://cdn.pixabay.com/download/audio/2022/10/14/audio_99393165b4.mp3?filename=anime-game-theme-1234.mp3'
+            }
+        ];
+
+        let currentTrackIndex = 0;
+        let isPlaying = false;
+        let audioElement, playBtn, playIcon, seekBar, currentTimeEl, durationTimeEl, volumeBar, vinylSpin;
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            // Inicialização dos elementos do DOM
+            modal = document.getElementById('pokemon-modal');
+            searchInput = document.getElementById('search-input');
+            clearSearchBtn = document.getElementById('clear-search');
+            loadingContainer = document.getElementById('loading-container');
+            grid = document.getElementById('pokemon-grid');
+            loadedCount = document.getElementById('loaded-count');
+            loadMoreBtn = document.getElementById('load-more-btn');
+
+            // Inicializar Audio Player Spotify
+            initAudioPlayer();
+
+            fetchPokemonList();
+
+            // Real-time Search Filter Event (com verificação de segurança)
+            if (searchInput) {
+                searchInput.addEventListener('input', handleSearch);
+            }
+
+            // Fechar ao clicar fora do container do modal (se modal existir)
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) closeModal();
+                });
+            }
+        });
+
+        function initAudioPlayer() {
+            audioElement = document.getElementById('audio-element');
+            playBtn = document.getElementById('play-pause-btn');
+            playIcon = document.getElementById('play-icon');
+            seekBar = document.getElementById('seek-bar');
+            currentTimeEl = document.getElementById('current-time');
+            durationTimeEl = document.getElementById('duration-time');
+            volumeBar = document.getElementById('volume-bar');
+            vinylSpin = document.getElementById('vinyl-spin');
+
+            loadTrack(currentTrackIndex);
+
+            // Suporte para recarregar fontes com redundância de erro
+            audioElement.addEventListener('error', (e) => {
+                console.warn("Erro ao carregar fonte de áudio. Tentando próxima faixa...");
+            });
+
+            // Timeupdate para atualizar a barra de progresso
+            audioElement.addEventListener('timeupdate', () => {
+                if (audioElement.duration) {
+                    const progress = (audioElement.currentTime / audioElement.duration) * 100;
+                    seekBar.value = progress;
+                    currentTimeEl.innerText = formatTime(audioElement.currentTime);
+                    durationTimeEl.innerText = formatTime(audioElement.duration);
+                }
+            });
+
+            // SeekBar Event
+            seekBar.addEventListener('input', () => {
+                if (audioElement.duration) {
+                    audioElement.currentTime = (seekBar.value / 100) * audioElement.duration;
+                }
+            });
+
+            // Volume Event
+            volumeBar.addEventListener('input', () => {
+                audioElement.volume = volumeBar.value / 100;
+            });
+
+            // Quando a música terminar, passa pra próxima
+            audioElement.addEventListener('ended', () => {
+                nextTrack();
+            });
+        }
+
+        function loadTrack(index) {
+            const track = tetoPlaylist[index];
+            document.getElementById('track-title').innerText = track.title;
+            document.getElementById('track-artist').innerText = track.artist;
+            document.getElementById('track-cover').src = track.cover;
+            document.getElementById('track-index-display').innerText = `${index + 1}/${tetoPlaylist.length}`;
+            
+            audioElement.src = track.src;
+            audioElement.load();
+        }
+
+        function togglePlay() {
+            if (isPlaying) {
+                audioElement.pause();
+                playIcon.className = 'fa-solid fa-play ml-0.5';
+                vinylSpin.classList.add('opacity-0');
+                isPlaying = false;
+            } else {
+                audioElement.play().then(() => {
+                    playIcon.className = 'fa-solid fa-pause';
+                    vinylSpin.classList.remove('opacity-0');
+                    isPlaying = true;
+                }).catch(err => {
+                    console.log("Clique no botão de Play para iniciar o áudio devido às políticas do navegador.");
+                });
+            }
+        }
+
+        function nextTrack() {
+            currentTrackIndex = (currentTrackIndex + 1) % tetoPlaylist.length;
+            loadTrack(currentTrackIndex);
+            if (isPlaying) {
+                audioElement.play();
+            }
+        }
+
+        function prevTrack() {
+            currentTrackIndex = (currentTrackIndex - 1 + tetoPlaylist.length) % tetoPlaylist.length;
+            loadTrack(currentTrackIndex);
+            if (isPlaying) {
+                audioElement.play();
+            }
+        }
+
+        function toggleMute() {
+            const volumeIcon = document.getElementById('volume-icon');
+            if (audioElement.muted) {
+                audioElement.muted = false;
+                volumeIcon.className = 'fa-solid fa-volume-high';
+            } else {
+                audioElement.muted = true;
+                volumeIcon.className = 'fa-solid fa-volume-xmark text-red-500';
+            }
+        }
+
+        function toggleMinimizePlayer() {
+            const card = document.getElementById('player-card');
+            const minimized = document.getElementById('player-minimized');
+            card.classList.toggle('hidden');
+            minimized.classList.toggle('hidden');
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "0:00";
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+        // ================================================================
+
+        // Carrega Lista Inicial de Pokémon
+        async function fetchPokemonList() {
+            if (isLoading) return;
+            isLoading = true;
+            if (loadingContainer) loadingContainer.classList.remove('hidden');
+
+            try {
+                const response = await fetch(`${POKEAPI_BASE}/pokemon?limit=${LIMIT}&offset=${offset}`);
+                const data = await response.json();
+
+                // Buscar detalhes completos de cada pokemon retornado
+                const detailPromises = data.results.map(pokemon => fetch(pokemon.url).then(res => res.json()));
+                const pokemonDetails = await Promise.all(detailPromises);
+
+                allLoadedPokemon.push(...pokemonDetails);
+                renderGrid(allLoadedPokemon);
+
+                offset += LIMIT;
+                if (loadedCount) loadedCount.innerText = allLoadedPokemon.length;
+
+                if (loadMoreBtn) loadMoreBtn.classList.remove('hidden');
+            } catch (error) {
+                console.error("Erro ao carregar lista de pokémon:", error);
+            } finally {
+                isLoading = false;
+                if (loadingContainer) loadingContainer.classList.add('hidden');
+            }
+        }
+
+        // Carregar mais Pokémon quando clicar no botão
+        function loadMorePokemon() {
+            fetchPokemonList();
+        }
+
+        // Renderiza a Grade de Cards dos Pokémon
+        function renderGrid(pokemonList) {
+            grid.innerHTML = '';
+
+            if (pokemonList.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 bg-teto-glass rounded-2xl border border-teto-border">
+                        <i class="fa-regular fa-face-frown text-4xl text-teto-red mb-3"></i>
+                        <p class="font-orbitron text-xl text-white">Nenhum Pokémon encontrado!</p>
+                        <p class="text-sm text-gray-400 mt-1">Tente pesquisar outro nome ou ID.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            pokemonList.forEach(pokemon => {
+                const card = createPokemonCard(pokemon);
+                grid.appendChild(card);
+            });
+        }
+
+        // Cria o elemento HTML de um Card Individual
+        function createPokemonCard(pokemon) {
+            const card = document.createElement('div');
+            card.className = 'bg-teto-glassCard backdrop-blur-md border border-teto-border rounded-2xl p-4 card-hover neon-border-hover cursor-pointer flex flex-col justify-between relative overflow-hidden group';
+            card.onclick = () => openPokemonModal(pokemon.id);
+
+            // Sprite Oficial ou Fallback
+            const sprite = pokemon.sprites.other['official-artwork'].front_default || 
+                           pokemon.sprites.front_default || 
+                           'https://via.placeholder.com/150?text=No+Image';
+
+            // Formatação do ID (#001)
+            const formattedId = `#${String(pokemon.id).padStart(3, '0')}`;
+
+            // Tipos
+            const typesHTML = pokemon.types.map(t => {
+                return `<span class="px-2.5 py-0.5 rounded-full text-xs font-bold uppercase tracking-wider type-${t.type.name}">${t.type.name}</span>`;
+            }).join('');
+
+            // Status Rápidos (HP e ATK)
+            const hpStat = pokemon.stats.find(s => s.stat.name === 'hp')?.base_stat || 0;
+            const atkStat = pokemon.stats.find(s => s.stat.name === 'attack')?.base_stat || 0;
+
+            card.innerHTML = `
+                <!-- Fundo decorativo neon -->
+                <div class="absolute -right-10 -bottom-10 w-28 h-28 bg-teto-red/10 rounded-full blur-xl group-hover:bg-teto-red/30 transition-all"></div>
+
+                <div>
+                    <!-- ID e Nome -->
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-orbitron text-xs text-teto-red font-bold px-2 py-0.5 bg-black/50 rounded border border-teto-border/50">${formattedId}</span>
+                        <i class="fa-solid fa-chevron-right text-xs text-teto-red opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                    </div>
+
+                    <!-- Imagem do Pokémon -->
+                    <div class="my-2 h-36 flex items-center justify-center p-2">
+                        <img src="${sprite}" alt="${pokemon.name}" class="max-h-full max-w-full object-contain drop-shadow-[0_4px_10px_rgba(0,0,0,0.6)] group-hover:scale-110 transition-transform duration-300" loading="lazy">
+                    </div>
+
+                    <!-- Nome -->
+                    <h3 class="font-orbitron text-xl font-extrabold text-white capitalize tracking-wide mb-2 text-center group-hover:text-teto-red transition-colors">${pokemon.name}</h3>
+
+                    <!-- Tipos -->
+                    <div class="flex flex-wrap gap-1.5 justify-center mb-4">
+                        ${typesHTML}
+                    </div>
+                </div>
+
+                <!-- Resumo de Atributos -->
+                <div class="grid grid-cols-2 gap-2 text-xs bg-black/40 p-2 rounded-xl border border-teto-border/30">
+                    <div class="text-center">
+                        <span class="text-gray-400 block">HP</span>
+                        <span class="font-orbitron text-white font-bold">${hpStat}</span>
+                    </div>
+                    <div class="text-center border-l border-teto-border/30">
+                        <span class="text-gray-400 block">ATK</span>
+                        <span class="font-orbitron text-white font-bold">${atkStat}</span>
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // Função de Pesquisa
+        async function handleSearch() {
+            const query = searchInput.value.trim().toLowerCase();
+
+            if (query.length > 0) {
+                clearSearchBtn.classList.remove('hidden');
+            } else {
+                clearSearchBtn.classList.add('hidden');
+                renderGrid(allLoadedPokemon);
+                return;
+            }
+
+            // Pesquisar localmente entre os já carregados
+            const localFiltered = allLoadedPokemon.filter(p => 
+                p.name.toLowerCase().includes(query) || p.id.toString() === query
+            );
+
+            if (localFiltered.length > 0) {
+                renderGrid(localFiltered);
+            } else if (query.length >= 2) {
+                // Tentar buscar na PokéAPI se não encontrado nos carregados
+                try {
+                    const response = await fetch(`${POKEAPI_BASE}/pokemon/${query}`);
+                    if (response.ok) {
+                        const searchedPokemon = await response.json();
+                        renderGrid([searchedPokemon]);
+                    } else {
+                        renderGrid([]);
+                    }
+                } catch (e) {
+                    renderGrid([]);
+                }
+            }
+        }
+
+        function clearSearch() {
+            searchInput.value = '';
+            clearSearchBtn.classList.add('hidden');
+            renderGrid(allLoadedPokemon);
+        }
+
+        function resetSearch() {
+            clearSearch();
+            document.getElementById('type-filter').value = 'all';
+        }
+
+        // Filtro por Tipo
+        function filterByType() {
+            const selectedType = document.getElementById('type-filter').value;
+            if (selectedType === 'all') {
+                renderGrid(allLoadedPokemon);
+                return;
+            }
+
+            const filtered = allLoadedPokemon.filter(pokemon => 
+                pokemon.types.some(t => t.type.name === selectedType)
+            );
+            renderGrid(filtered);
+        }
+
+        // ABRIR MODAL DE DETALHES COMPLETO V2.0
+        async function openPokemonModal(pokemonId) {
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Impede scroll no fundo
+
+            const modalLoading = document.getElementById('modal-loading');
+            const modalContent = document.getElementById('modal-content');
+
+            modalLoading.classList.remove('hidden');
+            modalContent.classList.add('hidden');
+
+            // Resetar estados
+            isShinyMode = false;
+            updateShinyUI();
+
+            try {
+                // Obter dados básicos e da espécie
+                const pokemonData = await fetch(`${POKEAPI_BASE}/pokemon/${pokemonId}`).then(res => res.json());
+                
+                let speciesData = null;
+                try {
+                    speciesData = await fetch(pokemonData.species.url).then(res => res.json());
+                } catch(e) {
+                    speciesData = null;
+                }
+
+                currentSpeciesData = speciesData;
+                currentVarietyData = pokemonData;
+
+                // Popular Seletor de Variedades (Formas, Megas, Gigantamax)
+                populateVarietiesSelect(speciesData, pokemonData.name);
+
+                // Renderizar a Variedade Atual
+                renderVarietyData(pokemonData);
+
+                // Exibir Conteúdo
+                modalLoading.classList.add('hidden');
+                modalContent.classList.remove('hidden');
+
+            } catch (error) {
+                console.error("Erro ao carregar detalhes do Pokémon:", error);
+                closeModal();
+            }
+        }
+
+        // Popula o Dropdown de Formas e Variantes
+        function populateVarietiesSelect(speciesData, currentPokemonName) {
+            const select = document.getElementById('variety-select');
+            select.innerHTML = '';
+
+            if (!speciesData || !speciesData.varieties || speciesData.varieties.length <= 1) {
+                select.innerHTML = `<option value="${currentPokemonName}">Forma Padrão</option>`;
+                return;
+            }
+
+            speciesData.varieties.forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v.pokemon.name;
+                
+                // Formatação legível do nome da forma (ex: charizard-mega-x -> Mega X)
+                let rawName = v.pokemon.name;
+                let displayName = rawName.replace('-', ' ');
+                if (v.is_default) {
+                    displayName = "Padrão";
+                } else {
+                    displayName = displayName.replace(speciesData.name, '').trim();
+                    if (displayName === '') displayName = rawName;
+                }
+
+                opt.innerText = displayName.toUpperCase();
+                if (v.pokemon.name === currentPokemonName) {
+                    opt.selected = true;
+                }
+                select.appendChild(opt);
+            });
+        }
+
+        // Muda a Forma selecionada via Dropdown
+        async function changeVariety(varietyName) {
+            if (!varietyName) return;
+            
+            const modalLoading = document.getElementById('modal-loading');
+            const modalContent = document.getElementById('modal-content');
+
+            modalLoading.classList.remove('hidden');
+            modalContent.classList.add('hidden');
+
+            try {
+                const varietyData = await fetch(`${POKEAPI_BASE}/pokemon/${varietyName}`).then(res => res.json());
+                currentVarietyData = varietyData;
+                renderVarietyData(varietyData);
+            } catch (error) {
+                console.error("Erro ao trocar variedade:", error);
+            } finally {
+                modalLoading.classList.add('hidden');
+                modalContent.classList.remove('hidden');
+            }
+        }
+
+        // Renderiza as informações de uma determinada variedade do Pokémon
+        function renderVarietyData(pokemonData) {
+            // Configurar Sprites (Normal vs Shiny)
+            updateSprites(pokemonData);
+
+            document.getElementById('modal-id').innerText = `#${String(pokemonData.id).padStart(3, '0')}`;
+            document.getElementById('modal-name').innerText = pokemonData.name.replace('-', ' ');
+
+            // Tipos
+            const typesContainer = document.getElementById('modal-types');
+            typesContainer.innerHTML = pokemonData.types.map(t => 
+                `<span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider type-${t.type.name}">${t.type.name}</span>`
+            ).join('');
+
+            // Descrição da Dex
+            let flavorText = "Nenhuma descrição registrada para esta forma.";
+            if (currentSpeciesData && currentSpeciesData.flavor_text_entries && currentSpeciesData.flavor_text_entries.length > 0) {
+                const ptEntry = currentSpeciesData.flavor_text_entries.find(e => e.language.name === 'pt' || e.language.name === 'pt-BR');
+                const enEntry = currentSpeciesData.flavor_text_entries.find(e => e.language.name === 'en');
+                const entry = ptEntry || enEntry;
+                if (entry) {
+                    flavorText = entry.flavor_text.replace(/[\n\f]/g, ' ');
+                }
+            }
+            document.getElementById('modal-description').innerText = `"${flavorText}"`;
+
+            // Altura, Peso e Habilidades
+            document.getElementById('modal-height').innerText = `${(pokemonData.height / 10).toFixed(1)} m`;
+            document.getElementById('modal-weight').innerText = `${(pokemonData.weight / 10).toFixed(1)} kg`;
+            
+            const abilities = pokemonData.abilities.map(a => a.ability.name.replace('-', ' ')).join(', ');
+            document.getElementById('modal-abilities').innerText = abilities || '--';
+
+            // Preencher Status Base
+            renderModalStats(pokemonData.stats);
+
+            // Preencher Ataques Aprendidos
+            renderModalMoves(pokemonData.moves);
+        }
+
+        // Atualiza Lista de Sprites Disponíveis (Normal vs Shiny)
+        function updateSprites(pokemonData) {
+            const sprites = pokemonData.sprites;
+
+            if (isShinyMode) {
+                spriteUrls = [
+                    sprites.other['official-artwork']?.front_shiny,
+                    sprites.other['showdown']?.front_shiny || sprites.front_shiny,
+                    sprites.front_shiny,
+                    sprites.back_shiny
+                ].filter(Boolean);
+            } else {
+                spriteUrls = [
+                    sprites.other['official-artwork']?.front_default,
+                    sprites.other['showdown']?.front_default || sprites.front_default,
+                    sprites.front_default,
+                    sprites.back_default
+                ].filter(Boolean);
+            }
+
+            // Se não houver shiny disponível, tenta fallback para normal
+            if (spriteUrls.length === 0) {
+                spriteUrls = [
+                    sprites.other['official-artwork']?.front_default || sprites.front_default
+                ].filter(Boolean);
+            }
+
+            currentSpriteIndex = 0;
+            document.getElementById('modal-img').src = spriteUrls[0] || 'https://via.placeholder.com/200?text=No+Image';
+        }
+
+        // Alterna entre modo Normal e Shiny
+        function toggleShinyMode(shiny) {
+            isShinyMode = shiny;
+            updateShinyUI();
+
+            if (currentVarietyData) {
+                updateSprites(currentVarietyData);
+            }
+        }
+
+        function updateShinyUI() {
+            const btnNormal = document.getElementById('btn-normal-mode');
+            const btnShiny = document.getElementById('btn-shiny-mode');
+            const shinyBadge = document.getElementById('shiny-badge');
+
+            if (isShinyMode) {
+                btnShiny.className = "px-3 py-1 text-xs font-orbitron rounded-lg transition-all bg-yellow-500 text-black font-bold shadow-[0_0_10px_#eab308]";
+                btnNormal.className = "px-3 py-1 text-xs font-orbitron rounded-lg transition-all text-gray-400 hover:text-white";
+                shinyBadge.classList.remove('hidden');
+            } else {
+                btnNormal.className = "px-3 py-1 text-xs font-orbitron rounded-lg transition-all bg-teto-red text-white font-bold shadow";
+                btnShiny.className = "px-3 py-1 text-xs font-orbitron rounded-lg transition-all text-gray-400 hover:text-white";
+                shinyBadge.classList.add('hidden');
+            }
+        }
+
+        // Alternar visualização da Sprite no Modal
+        function toggleSpriteView() {
+            if (spriteUrls.length <= 1) return;
+            currentSpriteIndex = (currentSpriteIndex + 1) % spriteUrls.length;
+            document.getElementById('modal-img').src = spriteUrls[currentSpriteIndex];
+        }
+
+        // Renderizar Status com barras de progresso estilo Kasane Teto Red
+        function renderModalStats(stats) {
+            const container = document.getElementById('modal-stats-container');
+            container.innerHTML = '';
+
+            const statNamesPt = {
+                'hp': 'HP',
+                'attack': 'Ataque',
+                'defense': 'Defesa',
+                'special-attack': 'Atq. Especial',
+                'special-defense': 'Def. Especial',
+                'speed': 'Velocidade'
+            };
+
+            const maxStat = 255;
+
+            stats.forEach(stat => {
+                const name = statNamesPt[stat.stat.name] || stat.stat.name;
+                const value = stat.base_stat;
+                const percentage = Math.min((value / maxStat) * 100, 100);
+
+                const statRow = document.createElement('div');
+                statRow.className = 'flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4';
+
+                statRow.innerHTML = `
+                    <span class="w-28 text-xs font-orbitron text-gray-300 uppercase">${name}</span>
+                    <span class="w-10 text-sm font-bold font-orbitron text-teto-red text-right">${value}</span>
+                    <div class="flex-grow bg-black/60 h-3 rounded-full overflow-hidden border border-teto-border/40 relative">
+                        <div class="bg-gradient-to-r from-teto-darkred via-teto-red to-red-400 h-full rounded-full transition-all duration-700 shadow-[0_0_8px_#e60033]" style="width: ${percentage}%"></div>
+                    </div>
+                `;
+                container.appendChild(statRow);
+            });
+        }
+
+        // Renderizar Ataques Aprendidos
+        function renderModalMoves(moves) {
+            const container = document.getElementById('modal-moves-container');
+            document.getElementById('moves-count').innerText = moves.length;
+            container.innerHTML = '';
+
+            if (moves.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 col-span-full text-center py-4">Nenhum ataque registrado para esta variante.</p>`;
+                return;
+            }
+
+            moves.slice(0, 60).forEach(m => {
+                const moveName = m.move.name.replace('-', ' ');
+                
+                const versionDetails = m.version_group_details[m.version_group_details.length - 1];
+                const level = versionDetails ? versionDetails.level_learned_at : 0;
+                const method = versionDetails ? versionDetails.move_learn_method.name : 'other';
+
+                let methodBadge = '';
+                if (method === 'level-up') {
+                    methodBadge = `<span class="text-[10px] bg-teto-red/30 border border-teto-red text-red-200 px-1.5 py-0.5 rounded">Nvl ${level}</span>`;
+                } else if (method === 'machine') {
+                    methodBadge = `<span class="text-[10px] bg-blue-900/40 border border-blue-500 text-blue-200 px-1.5 py-0.5 rounded">TM/HM</span>`;
+                } else {
+                    methodBadge = `<span class="text-[10px] bg-gray-800 border border-gray-600 text-gray-300 px-1.5 py-0.5 rounded capitalize">${method}</span>`;
+                }
+
+                const moveCard = document.createElement('div');
+                moveCard.className = 'bg-black/40 border border-teto-border/40 p-2.5 rounded-lg flex items-center justify-between text-xs hover:border-teto-red transition-colors';
+                
+                moveCard.innerHTML = `
+                    <span class="capitalize text-gray-200 font-semibold truncate mr-2">${moveName}</span>
+                    ${methodBadge}
+                `;
+
+                container.appendChild(moveCard);
+            });
+        }
+
+        // Troca de Abas no Modal (Status / Ataques)
+        function switchTab(tab) {
+            const statsTab = document.getElementById('tab-stats');
+            const movesTab = document.getElementById('tab-moves');
+            const statsBtn = document.getElementById('tab-stats-btn');
+            const movesBtn = document.getElementById('tab-moves-btn');
+
+            if (tab === 'stats') {
+                statsTab.classList.remove('hidden');
+                movesTab.classList.add('hidden');
+                statsBtn.className = "px-6 py-2.5 font-orbitron text-sm tracking-wider font-bold border-b-2 border-teto-red text-teto-red focus:outline-none";
+                movesBtn.className = "px-6 py-2.5 font-orbitron text-sm tracking-wider font-bold border-b-2 border-transparent text-gray-400 hover:text-white focus:outline-none";
+            } else {
+                statsTab.classList.add('hidden');
+                movesTab.classList.remove('hidden');
+                statsBtn.className = "px-6 py-2.5 font-orbitron text-sm tracking-wider font-bold border-b-2 border-transparent text-gray-400 hover:text-white focus:outline-none";
+                movesBtn.className = "px-6 py-2.5 font-orbitron text-sm tracking-wider font-bold border-b-2 border-teto-red text-teto-red focus:outline-none";
+            }
+        }
+
+        // Fechar Modal
+        function closeModal() {
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+            document.body.style.overflow = 'auto';
+        }
+    </script>
+</body>
+</html>
+```
