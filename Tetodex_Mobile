@@ -1,0 +1,802 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tetodex v2.0 - Kasane Teto Pokédex Mobile</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Orbitron & Rajdhani -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800;900&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        teto: {
+                            red: '#e60033',
+                            darkred: '#80001c',
+                            crimson: '#b30024',
+                            black: '#0d0d0d',
+                            glass: 'rgba(20, 5, 10, 0.85)',
+                            glassCard: 'rgba(25, 6, 12, 0.75)',
+                            border: 'rgba(230, 0, 51, 0.35)'
+                        }
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        rajdhani: ['Rajdhani', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background-color: #0d0d0d;
+            background-image: url('https://preview.redd.it/does-someone-have-a-good-teto-wallpaper-for-pc-v0-3ejvob6zbtug1.jpeg?width=2560&format=pjpg&auto=webp&s=32f1813dcfb5d74a32a94b71948a438af9fcef78');
+            background-attachment: fixed;
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            color: #ffffff;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .bg-overlay {
+            background: linear-gradient(135deg, rgba(13,13,13,0.85) 0%, rgba(128,0,28,0.4) 50%, rgba(13,13,13,0.9) 100%);
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(13, 13, 13, 0.8);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #e60033;
+            border-radius: 4px;
+        }
+
+        /* Neon Effects */
+        .neon-glow-red {
+            text-shadow: 0 0 8px rgba(230, 0, 51, 0.8), 0 0 16px rgba(230, 0, 51, 0.5);
+        }
+
+        .neon-border {
+            box-shadow: 0 0 12px rgba(230, 0, 51, 0.35), inset 0 0 10px rgba(230, 0, 51, 0.2);
+        }
+
+        .neon-border-hover:active, .neon-border-hover:hover {
+            box-shadow: 0 0 18px rgba(230, 0, 51, 0.7), inset 0 0 12px rgba(230, 0, 51, 0.4);
+            border-color: #e60033;
+        }
+
+        /* Type Badges */
+        .type-normal { background: #A8A878; color: #000; }
+        .type-fire { background: #F08030; color: #fff; }
+        .type-water { background: #6890F0; color: #fff; }
+        .type-grass { background: #78C850; color: #000; }
+        .type-electric { background: #F8D030; color: #000; }
+        .type-ice { background: #98D8D8; color: #000; }
+        .type-fighting { background: #C03028; color: #fff; }
+        .type-poison { background: #A040A0; color: #fff; }
+        .type-ground { background: #E0C068; color: #000; }
+        .type-flying { background: #A890F0; color: #fff; }
+        .type-psychic { background: #F85888; color: #fff; }
+        .type-bug { background: #A8B820; color: #000; }
+        .type-rock { background: #B8A038; color: #fff; }
+        .type-ghost { background: #705898; color: #fff; }
+        .type-dragon { background: #7038F8; color: #fff; }
+        .type-steel { background: #B8B8D0; color: #000; }
+        .type-fairy { background: #EE99AC; color: #000; }
+        .type-dark { background: #705848; color: #fff; }
+
+        .card-hover {
+            transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.2s;
+        }
+        .card-hover:active {
+            transform: scale(0.97);
+        }
+        @media (min-width: 768px) {
+            .card-hover:hover {
+                transform: translateY(-5px) scale(1.02);
+            }
+        }
+    </style>
+</head>
+<body class="relative min-h-screen pb-16 flex flex-col antialiased">
+
+    <!-- Fundo de Overlay -->
+    <div class="bg-overlay"></div>
+
+    <!-- HEADER RESPONSIVO -->
+    <header class="sticky top-0 z-30 backdrop-blur-lg bg-teto-glass border-b border-teto-border shadow-2xl">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-3">
+            
+            <!-- LOGO / MARCA -->
+            <div class="flex items-center justify-between w-full md:w-auto cursor-pointer" onclick="resetSearch()">
+                <div class="flex items-center space-x-3">
+                    <div class="relative w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-full bg-teto-darkred border-2 border-teto-red shadow-lg overflow-hidden">
+                        <i class="fa-solid fa-compact-disc text-teto-red text-xl sm:text-2xl animate-spin" style="animation-duration: 8s;"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-orbitron text-2xl sm:text-3xl font-black tracking-wider text-white neon-glow-red flex items-center gap-2">
+                            TETO<span class="text-teto-red">DEX</span>
+                            <span class="text-[10px] sm:text-xs font-normal tracking-normal px-1.5 py-0.5 rounded bg-teto-red/30 border border-teto-red text-red-200">v2.0 Mobile</span>
+                        </h1>
+                        <p class="text-[10px] sm:text-xs text-red-300/80 font-rajdhani font-semibold uppercase tracking-widest">Kasane Teto Pokédex Protocol</p>
+                    </div>
+                </div>
+
+                <!-- Indicador visual mobile -->
+                <div class="md:hidden flex items-center gap-1 text-teto-red text-xs font-orbitron bg-teto-red/10 px-2 py-1 rounded border border-teto-red/30">
+                    <i class="fa-solid fa-mobile-screen"></i>
+                    <span>TOUCH</span>
+                </div>
+            </div>
+
+            <!-- CONTROLES DE PESQUISA E FILTRO PARA CELULAR -->
+            <div class="flex flex-col sm:flex-row items-center gap-2 w-full md:w-auto">
+                <div class="relative w-full sm:w-72">
+                    <input type="text" id="search-input" placeholder="Buscar Pokémon por nome ou ID..." 
+                        class="w-full pl-10 pr-10 py-2.5 bg-black/70 border border-teto-border rounded-xl text-white placeholder-red-300/50 focus:outline-none focus:border-teto-red text-base font-rajdhani shadow-inner">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3.5 text-teto-red"></i>
+                    <button id="clear-search" onclick="clearSearch()" class="hidden absolute right-3 top-2.5 p-1 text-gray-400 hover:text-white">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+
+                <select id="type-filter" onchange="filterByType()" class="w-full sm:w-auto px-3 py-2.5 bg-black/70 border border-teto-border rounded-xl text-white focus:outline-none focus:border-teto-red text-base font-rajdhani cursor-pointer">
+                    <option value="all">Todos os Tipos</option>
+                    <option value="normal">Normal</option>
+                    <option value="fire">Fogo (Fire)</option>
+                    <option value="water">Água (Water)</option>
+                    <option value="grass">Planta (Grass)</option>
+                    <option value="electric">Elétrico (Electric)</option>
+                    <option value="ice">Gelo (Ice)</option>
+                    <option value="fighting">Lutador (Fighting)</option>
+                    <option value="poison">Veneno (Poison)</option>
+                    <option value="ground">Terrestre (Ground)</option>
+                    <option value="flying">Voador (Flying)</option>
+                    <option value="psychic">Psíquico (Psychic)</option>
+                    <option value="bug">Inseto (Bug)</option>
+                    <option value="rock">Pedra (Rock)</option>
+                    <option value="ghost">Fantasma (Ghost)</option>
+                    <option value="dragon">Dragão (Dragon)</option>
+                    <option value="steel">Aço (Steel)</option>
+                    <option value="fairy">Fada (Fairy)</option>
+                    <option value="dark">Sombrio (Dark)</option>
+                </select>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 py-4 flex-grow w-full">
+        
+        <!-- STATUS BAR -->
+        <div class="mb-5 p-3 sm:p-4 rounded-xl bg-teto-glass backdrop-blur-md border border-teto-border flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
+            <div class="flex items-center gap-2">
+                <i class="fa-solid fa-microchip text-teto-red text-base sm:text-xl"></i>
+                <span class="text-xs sm:text-sm text-gray-300 font-semibold">Total Carregados: <strong id="loaded-count" class="text-teto-red font-orbitron text-base">0</strong></span>
+            </div>
+            <div class="text-[11px] sm:text-xs text-red-300/80 font-medium">
+                <i class="fa-solid fa-hand-pointer mr-1"></i>Toque no Pokémon para ver shiny, megas, status e golpes!
+            </div>
+        </div>
+
+        <!-- GRID DE POKÉMON (RESPONSIVO: 2 COLUNAS NO MOBILE) -->
+        <div id="pokemon-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-5">
+            <!-- Cards gerados via JS -->
+        </div>
+
+        <!-- INDICADOR DE CARREGAMENTO (SPINNER) -->
+        <div id="loading-container" class="my-8 text-center hidden">
+            <div class="inline-flex items-center gap-3 px-6 py-3 rounded-xl bg-teto-glass border border-teto-border neon-border">
+                <i class="fa-solid fa-spinner animate-spin text-2xl text-teto-red"></i>
+                <span class="font-orbitron text-sm text-white font-bold">Acessando PokéAPI...</span>
+            </div>
+        </div>
+
+        <!-- BOTÃO CARREGAR MAIS -->
+        <div class="mt-8 text-center">
+            <button id="load-more-btn" onclick="loadMorePokemon()" class="w-full sm:w-auto px-8 py-3.5 bg-teto-darkred border-2 border-teto-red hover:bg-teto-red rounded-xl font-orbitron font-extrabold text-sm sm:text-base text-white tracking-wider neon-border transition-all active:scale-95 shadow-lg hidden">
+                <i class="fa-solid fa-plus-circle mr-2"></i>CARREGAR MAIS POKÉMON
+            </button>
+        </div>
+    </main>
+
+    <!-- MODAL RESPONSIVO PARA CELULAR (DETALHES COMPLETOS) -->
+    <div id="pokemon-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 hidden transition-opacity duration-300">
+        
+        <div class="bg-teto-glass border-2 border-teto-red rounded-2xl w-full max-w-2xl max-h-[90vh] sm:max-h-[85vh] overflow-hidden flex flex-col shadow-2xl neon-border relative">
+            
+            <!-- BOTÃO FECHAR FLUTUANTE -->
+            <button onclick="closeModal()" class="absolute top-3 right-3 z-20 w-10 h-10 bg-black/70 hover:bg-teto-red border border-teto-red/50 rounded-full text-white flex items-center justify-center transition-colors active:scale-90">
+                <i class="fa-solid fa-xmark text-xl"></i>
+            </button>
+
+            <!-- SPINNER DENTRO DO MODAL -->
+            <div id="modal-loading" class="p-12 text-center my-auto">
+                <i class="fa-solid fa-compact-disc animate-spin text-4xl text-teto-red mb-3"></i>
+                <p class="font-orbitron text-sm text-gray-300">Sincronizando Tetodex...</p>
+            </div>
+
+            <!-- CONTEÚDO SCROLLÁVEL DO MODAL -->
+            <div id="modal-content" class="overflow-y-auto p-4 sm:p-6 flex-grow space-y-4 hidden">
+                
+                <!-- TOP HEADER DO POKEMON -->
+                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-teto-border/50 pb-3 pr-10">
+                    <div>
+                        <span id="modal-id" class="font-orbitron text-xs sm:text-sm text-teto-red font-extrabold px-2 py-0.5 bg-black/60 rounded border border-teto-border">#000</span>
+                        <h2 id="modal-name" class="font-orbitron text-xl sm:text-3xl font-black text-white capitalize tracking-wide mt-1">--</h2>
+                    </div>
+                    <div id="modal-types" class="flex flex-wrap gap-1"></div>
+                </div>
+
+                <!-- PAINEL DE CONTROLES: FORMAS E SHINY -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 bg-black/50 p-2.5 rounded-xl border border-teto-border/40">
+                    <!-- Seletor de Formas/Megas -->
+                    <div>
+                        <label class="block text-[10px] font-orbitron text-gray-400 mb-1">FORMA / VARIANTE:</label>
+                        <select id="variety-select" onchange="changeVariety(this.value)" class="w-full px-2.5 py-1.5 bg-teto-darkred/60 border border-teto-border rounded-lg text-white text-xs font-rajdhani font-bold focus:outline-none">
+                        </select>
+                    </div>
+
+                    <!-- Toggle Normal / Shiny -->
+                    <div>
+                        <label class="block text-[10px] font-orbitron text-gray-400 mb-1">VERSÃO COLORIDA:</label>
+                        <div class="flex items-center gap-1 bg-black/60 p-1 rounded-lg border border-teto-border/30">
+                            <button id="btn-normal-mode" onclick="toggleShinyMode(false)" class="flex-1 py-1 text-xs font-orbitron rounded font-bold transition-all bg-teto-red text-white">NORMAL</button>
+                            <button id="btn-shiny-mode" onclick="toggleShinyMode(true)" class="flex-1 py-1 text-xs font-orbitron rounded font-bold transition-all text-gray-400">✨ SHINY</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- IMAGEM E SPRITE VIEWER -->
+                <div class="relative bg-black/40 rounded-2xl p-4 border border-teto-border/30 flex flex-col items-center justify-center min-h-[180px]">
+                    <span id="shiny-badge" class="absolute top-3 left-3 bg-yellow-500/20 border border-yellow-500 text-yellow-300 font-orbitron text-[10px] px-2 py-0.5 rounded-full font-bold hidden">
+                        ✨ BRILHANTE (SHINY)
+                    </span>
+
+                    <img id="modal-img" src="" alt="Pokemon Sprite" class="h-36 sm:h-48 object-contain drop-shadow-[0_4px_15px_rgba(230,0,51,0.4)] transition-all duration-300">
+                    
+                    <button onclick="toggleSpriteView()" class="mt-2 text-xs font-orbitron text-teto-red hover:text-white flex items-center gap-1 bg-teto-red/10 px-3 py-1 rounded-full border border-teto-red/30">
+                        <i class="fa-solid fa-rotate"></i>
+                        <span>Alternar Sprite/Ângulo</span>
+                    </button>
+                </div>
+
+                <!-- DESCRIÇÃO DA POKÉDEX -->
+                <div class="bg-black/50 p-3 sm:p-4 rounded-xl border border-teto-border/40">
+                    <h4 class="font-orbitron text-xs text-teto-red font-bold uppercase mb-1"><i class="fa-solid fa-quote-left mr-1"></i>Descrição da Dex:</h4>
+                    <p id="modal-description" class="text-xs sm:text-sm text-gray-200 italic leading-relaxed">Carregando...</p>
+                </div>
+
+                <!-- CARACTERÍSTICAS FÍSICAS -->
+                <div class="grid grid-cols-3 gap-2 text-center text-xs">
+                    <div class="bg-black/40 p-2 rounded-xl border border-teto-border/30">
+                        <span class="text-gray-400 block text-[10px]">ALTURA</span>
+                        <span id="modal-height" class="font-orbitron font-bold text-white">--</span>
+                    </div>
+                    <div class="bg-black/40 p-2 rounded-xl border border-teto-border/30">
+                        <span class="text-gray-400 block text-[10px]">PESO</span>
+                        <span id="modal-weight" class="font-orbitron font-bold text-white">--</span>
+                    </div>
+                    <div class="bg-black/40 p-2 rounded-xl border border-teto-border/30">
+                        <span class="text-gray-400 block text-[10px]">HABILIDADES</span>
+                        <span id="modal-abilities" class="font-orbitron font-bold text-teto-red text-[10px] truncate block">--</span>
+                    </div>
+                </div>
+
+                <!-- NAVEGAÇÃO POR ABAS (STATUS / ATAQUES) -->
+                <div class="border-b border-teto-border/50 flex">
+                    <button id="tab-stats-btn" onclick="switchTab('stats')" class="flex-1 py-2 font-orbitron text-xs sm:text-sm font-bold border-b-2 border-teto-red text-teto-red">
+                        ATRIBUTOS BASE
+                    </button>
+                    <button id="tab-moves-btn" onclick="switchTab('moves')" class="flex-1 py-2 font-orbitron text-xs sm:text-sm font-bold border-b-2 border-transparent text-gray-400">
+                        ATAQUES (<span id="moves-count">0</span>)
+                    </button>
+                </div>
+
+                <!-- CONTEÚDO DAS ABAS -->
+                <div id="tab-stats" class="space-y-2 pt-1">
+                    <div id="modal-stats-container" class="space-y-2"></div>
+                </div>
+
+                <div id="tab-moves" class="hidden pt-1">
+                    <div id="modal-moves-container" class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-60 overflow-y-auto pr-1"></div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        const POKEAPI_BASE = 'https://pokeapi.co/api/v2';
+        const LIMIT = 30;
+        let offset = 0;
+        let isLoading = false;
+        let allLoadedPokemon = [];
+        let isShinyMode = false;
+        let currentSpeciesData = null;
+        let currentVarietyData = null;
+        let spriteUrls = [];
+        let currentSpriteIndex = 0;
+
+        let modal, searchInput, clearSearchBtn, loadingContainer, grid, loadedCount, loadMoreBtn;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            modal = document.getElementById('pokemon-modal');
+            searchInput = document.getElementById('search-input');
+            clearSearchBtn = document.getElementById('clear-search');
+            loadingContainer = document.getElementById('loading-container');
+            grid = document.getElementById('pokemon-grid');
+            loadedCount = document.getElementById('loaded-count');
+            loadMoreBtn = document.getElementById('load-more-btn');
+
+            fetchPokemonList();
+
+            if (searchInput) {
+                searchInput.addEventListener('input', handleSearch);
+            }
+
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) closeModal();
+                });
+            }
+        });
+
+        async function fetchPokemonList() {
+            if (isLoading) return;
+            isLoading = true;
+            if (loadingContainer) loadingContainer.classList.remove('hidden');
+
+            try {
+                const response = await fetch(`${POKEAPI_BASE}/pokemon?limit=${LIMIT}&offset=${offset}`);
+                const data = await response.json();
+
+                const detailPromises = data.results.map(pokemon => fetch(pokemon.url).then(res => res.json()));
+                const pokemonDetails = await Promise.all(detailPromises);
+
+                allLoadedPokemon.push(...pokemonDetails);
+                renderGrid(allLoadedPokemon);
+
+                offset += LIMIT;
+                if (loadedCount) loadedCount.innerText = allLoadedPokemon.length;
+                if (loadMoreBtn) loadMoreBtn.classList.remove('hidden');
+
+            } catch (error) {
+                console.error("Erro ao carregar lista de pokémon:", error);
+            } finally {
+                isLoading = false;
+                if (loadingContainer) loadingContainer.classList.add('hidden');
+            }
+        }
+
+        function loadMorePokemon() {
+            fetchPokemonList();
+        }
+
+        function renderGrid(pokemonList) {
+            grid.innerHTML = '';
+
+            if (pokemonList.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-10 bg-teto-glass rounded-2xl border border-teto-border">
+                        <i class="fa-regular fa-face-frown text-3xl text-teto-red mb-2"></i>
+                        <p class="font-orbitron text-lg text-white">Nenhum Pokémon encontrado!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            pokemonList.forEach(pokemon => {
+                const card = createPokemonCard(pokemon);
+                grid.appendChild(card);
+            });
+        }
+
+        function createPokemonCard(pokemon) {
+            const card = document.createElement('div');
+            card.className = 'bg-teto-glassCard backdrop-blur-md border border-teto-border rounded-xl p-2.5 sm:p-4 card-hover neon-border-hover cursor-pointer flex flex-col justify-between relative overflow-hidden group';
+            card.onclick = () => openPokemonModal(pokemon.id);
+
+            const sprite = pokemon.sprites.other['official-artwork'].front_default || 
+                           pokemon.sprites.front_default || 
+                           'https://via.placeholder.com/150?text=No+Image';
+
+            const formattedId = `#${String(pokemon.id).padStart(3, '0')}`;
+
+            const typesHTML = pokemon.types.map(t => {
+                return `<span class="px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-xs font-bold uppercase tracking-wider type-${t.type.name}">${t.type.name}</span>`;
+            }).join('');
+
+            const hpStat = pokemon.stats.find(s => s.stat.name === 'hp')?.base_stat || 0;
+            const atkStat = pokemon.stats.find(s => s.stat.name === 'attack')?.base_stat || 0;
+
+            card.innerHTML = `
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <span class="font-orbitron text-[10px] sm:text-xs text-teto-red font-bold px-1.5 py-0.5 bg-black/60 rounded border border-teto-border/50">${formattedId}</span>
+                    </div>
+
+                    <div class="my-1 h-24 sm:h-36 flex items-center justify-center p-1">
+                        <img src="${sprite}" alt="${pokemon.name}" class="max-h-full max-w-full object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.6)]" loading="lazy">
+                    </div>
+
+                    <h3 class="font-orbitron text-sm sm:text-lg font-extrabold text-white capitalize tracking-wide mb-1.5 text-center truncate group-hover:text-teto-red">${pokemon.name}</h3>
+
+                    <div class="flex flex-wrap gap-1 justify-center mb-2">
+                        ${typesHTML}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-1 text-[10px] sm:text-xs bg-black/50 p-1.5 rounded-lg border border-teto-border/30">
+                    <div class="text-center">
+                        <span class="text-gray-400 block text-[9px]">HP</span>
+                        <span class="font-orbitron text-white font-bold">${hpStat}</span>
+                    </div>
+                    <div class="text-center border-l border-teto-border/30">
+                        <span class="text-gray-400 block text-[9px]">ATK</span>
+                        <span class="font-orbitron text-white font-bold">${atkStat}</span>
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        async function handleSearch() {
+            const query = searchInput.value.trim().toLowerCase();
+
+            if (query.length > 0) {
+                clearSearchBtn.classList.remove('hidden');
+            } else {
+                clearSearchBtn.classList.add('hidden');
+                renderGrid(allLoadedPokemon);
+                return;
+            }
+
+            const localFiltered = allLoadedPokemon.filter(p => 
+                p.name.toLowerCase().includes(query) || p.id.toString() === query
+            );
+
+            if (localFiltered.length > 0) {
+                renderGrid(localFiltered);
+            } else if (query.length >= 2) {
+                try {
+                    const response = await fetch(`${POKEAPI_BASE}/pokemon/${query}`);
+                    if (response.ok) {
+                        const searchedPokemon = await response.json();
+                        renderGrid([searchedPokemon]);
+                    } else {
+                        renderGrid([]);
+                    }
+                } catch (e) {
+                    renderGrid([]);
+                }
+            }
+        }
+
+        function clearSearch() {
+            searchInput.value = '';
+            clearSearchBtn.classList.add('hidden');
+            renderGrid(allLoadedPokemon);
+        }
+
+        function resetSearch() {
+            clearSearch();
+            document.getElementById('type-filter').value = 'all';
+        }
+
+        function filterByType() {
+            const selectedType = document.getElementById('type-filter').value;
+            if (selectedType === 'all') {
+                renderGrid(allLoadedPokemon);
+                return;
+            }
+
+            const filtered = allLoadedPokemon.filter(pokemon => 
+                pokemon.types.some(t => t.type.name === selectedType)
+            );
+            renderGrid(filtered);
+        }
+
+        async function openPokemonModal(pokemonId) {
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            const modalLoading = document.getElementById('modal-loading');
+            const modalContent = document.getElementById('modal-content');
+
+            modalLoading.classList.remove('hidden');
+            modalContent.classList.add('hidden');
+
+            isShinyMode = false;
+            updateShinyUI();
+
+            try {
+                const pokemonData = await fetch(`${POKEAPI_BASE}/pokemon/${pokemonId}`).then(res => res.json());
+                
+                let speciesData = null;
+                try {
+                    speciesData = await fetch(pokemonData.species.url).then(res => res.json());
+                } catch(e) {
+                    speciesData = null;
+                }
+
+                currentSpeciesData = speciesData;
+                currentVarietyData = pokemonData;
+
+                populateVarietiesSelect(speciesData, pokemonData.name);
+                renderVarietyData(pokemonData);
+
+                modalLoading.classList.add('hidden');
+                modalContent.classList.remove('hidden');
+
+            } catch (error) {
+                console.error("Erro ao carregar detalhes do Pokémon:", error);
+                closeModal();
+            }
+        }
+
+        function populateVarietiesSelect(speciesData, currentPokemonName) {
+            const select = document.getElementById('variety-select');
+            select.innerHTML = '';
+
+            if (!speciesData || !speciesData.varieties || speciesData.varieties.length <= 1) {
+                select.innerHTML = `<option value="${currentPokemonName}">Forma Padrão</option>`;
+                return;
+            }
+
+            speciesData.varieties.forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v.pokemon.name;
+                
+                let rawName = v.pokemon.name;
+                let displayName = rawName.replace('-', ' ');
+                if (v.is_default) {
+                    displayName = "Padrão";
+                } else {
+                    displayName = displayName.replace(speciesData.name, '').trim();
+                    if (displayName === '') displayName = rawName;
+                }
+
+                opt.innerText = displayName.toUpperCase();
+                if (v.pokemon.name === currentPokemonName) {
+                    opt.selected = true;
+                }
+                select.appendChild(opt);
+            });
+        }
+
+        async function changeVariety(varietyName) {
+            if (!varietyName) return;
+            
+            const modalLoading = document.getElementById('modal-loading');
+            const modalContent = document.getElementById('modal-content');
+
+            modalLoading.classList.remove('hidden');
+            modalContent.classList.add('hidden');
+
+            try {
+                const varietyData = await fetch(`${POKEAPI_BASE}/pokemon/${varietyName}`).then(res => res.json());
+                currentVarietyData = varietyData;
+                renderVarietyData(varietyData);
+            } catch (error) {
+                console.error("Erro ao trocar variedade:", error);
+            } finally {
+                modalLoading.classList.add('hidden');
+                modalContent.classList.remove('hidden');
+            }
+        }
+
+        function renderVarietyData(pokemonData) {
+            updateSprites(pokemonData);
+
+            document.getElementById('modal-id').innerText = `#${String(pokemonData.id).padStart(3, '0')}`;
+            document.getElementById('modal-name').innerText = pokemonData.name.replace('-', ' ');
+
+            const typesContainer = document.getElementById('modal-types');
+            typesContainer.innerHTML = pokemonData.types.map(t => 
+                `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider type-${t.type.name}">${t.type.name}</span>`
+            ).join('');
+
+            let flavorText = "Nenhuma descrição registrada para esta forma.";
+            if (currentSpeciesData && currentSpeciesData.flavor_text_entries && currentSpeciesData.flavor_text_entries.length > 0) {
+                const ptEntry = currentSpeciesData.flavor_text_entries.find(e => e.language.name === 'pt' || e.language.name === 'pt-BR');
+                const enEntry = currentSpeciesData.flavor_text_entries.find(e => e.language.name === 'en');
+                const entry = ptEntry || enEntry;
+                if (entry) {
+                    flavorText = entry.flavor_text.replace(/[\n\f]/g, ' ');
+                }
+            }
+            document.getElementById('modal-description').innerText = `"${flavorText}"`;
+
+            document.getElementById('modal-height').innerText = `${(pokemonData.height / 10).toFixed(1)} m`;
+            document.getElementById('modal-weight').innerText = `${(pokemonData.weight / 10).toFixed(1)} kg`;
+            
+            const abilities = pokemonData.abilities.map(a => a.ability.name.replace('-', ' ')).join(', ');
+            document.getElementById('modal-abilities').innerText = abilities || '--';
+
+            renderModalStats(pokemonData.stats);
+            renderModalMoves(pokemonData.moves);
+        }
+
+        function updateSprites(pokemonData) {
+            const sprites = pokemonData.sprites;
+
+            if (isShinyMode) {
+                spriteUrls = [
+                    sprites.other['official-artwork']?.front_shiny,
+                    sprites.other['showdown']?.front_shiny || sprites.front_shiny,
+                    sprites.front_shiny,
+                    sprites.back_shiny
+                ].filter(Boolean);
+            } else {
+                spriteUrls = [
+                    sprites.other['official-artwork']?.front_default,
+                    sprites.other['showdown']?.front_default || sprites.front_default,
+                    sprites.front_default,
+                    sprites.back_default
+                ].filter(Boolean);
+            }
+
+            if (spriteUrls.length === 0) {
+                spriteUrls = [
+                    sprites.other['official-artwork']?.front_default || sprites.front_default
+                ].filter(Boolean);
+            }
+
+            currentSpriteIndex = 0;
+            document.getElementById('modal-img').src = spriteUrls[0] || 'https://via.placeholder.com/200?text=No+Image';
+        }
+
+        function toggleShinyMode(shiny) {
+            isShinyMode = shiny;
+            updateShinyUI();
+
+            if (currentVarietyData) {
+                updateSprites(currentVarietyData);
+            }
+        }
+
+        function updateShinyUI() {
+            const btnNormal = document.getElementById('btn-normal-mode');
+            const btnShiny = document.getElementById('btn-shiny-mode');
+            const shinyBadge = document.getElementById('shiny-badge');
+
+            if (isShinyMode) {
+                btnShiny.className = "flex-1 py-1 text-xs font-orbitron rounded font-bold transition-all bg-yellow-500 text-black shadow-[0_0_10px_#eab308]";
+                btnNormal.className = "flex-1 py-1 text-xs font-orbitron rounded font-bold transition-all text-gray-400";
+                shinyBadge.classList.remove('hidden');
+            } else {
+                btnNormal.className = "flex-1 py-1 text-xs font-orbitron rounded font-bold transition-all bg-teto-red text-white";
+                btnShiny.className = "flex-1 py-1 text-xs font-orbitron rounded font-bold transition-all text-gray-400";
+                shinyBadge.classList.add('hidden');
+            }
+        }
+
+        function toggleSpriteView() {
+            if (spriteUrls.length <= 1) return;
+            currentSpriteIndex = (currentSpriteIndex + 1) % spriteUrls.length;
+            document.getElementById('modal-img').src = spriteUrls[currentSpriteIndex];
+        }
+
+        function renderModalStats(stats) {
+            const container = document.getElementById('modal-stats-container');
+            container.innerHTML = '';
+
+            const statNamesPt = {
+                'hp': 'HP',
+                'attack': 'Ataque',
+                'defense': 'Defesa',
+                'special-attack': 'Atq. Esp.',
+                'special-defense': 'Def. Esp.',
+                'speed': 'Velocidade'
+            };
+
+            const maxStat = 255;
+
+            stats.forEach(stat => {
+                const name = statNamesPt[stat.stat.name] || stat.stat.name;
+                const value = stat.base_stat;
+                const percentage = Math.min((value / maxStat) * 100, 100);
+
+                const statRow = document.createElement('div');
+                statRow.className = 'flex items-center gap-2 text-xs';
+
+                statRow.innerHTML = `
+                    <span class="w-20 text-[10px] font-orbitron text-gray-300 uppercase truncate">${name}</span>
+                    <span class="w-8 text-xs font-bold font-orbitron text-teto-red text-right">${value}</span>
+                    <div class="flex-grow bg-black/60 h-2.5 rounded-full overflow-hidden border border-teto-border/40 relative">
+                        <div class="bg-gradient-to-r from-teto-darkred via-teto-red to-red-400 h-full rounded-full transition-all duration-500" style="width: ${percentage}%"></div>
+                    </div>
+                `;
+                container.appendChild(statRow);
+            });
+        }
+
+        function renderModalMoves(moves) {
+            const container = document.getElementById('modal-moves-container');
+            document.getElementById('moves-count').innerText = moves.length;
+            container.innerHTML = '';
+
+            if (moves.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 col-span-full text-center py-4 text-xs">Nenhum ataque registrado.</p>`;
+                return;
+            }
+
+            moves.slice(0, 60).forEach(m => {
+                const moveName = m.move.name.replace('-', ' ');
+                
+                const versionDetails = m.version_group_details[m.version_group_details.length - 1];
+                const level = versionDetails ? versionDetails.level_learned_at : 0;
+                const method = versionDetails ? versionDetails.move_learn_method.name : 'other';
+
+                let methodBadge = '';
+                if (method === 'level-up') {
+                    methodBadge = `<span class="text-[9px] bg-teto-red/30 border border-teto-red text-red-200 px-1 py-0.5 rounded">Nvl ${level}</span>`;
+                } else if (method === 'machine') {
+                    methodBadge = `<span class="text-[9px] bg-blue-900/40 border border-blue-500 text-blue-200 px-1 py-0.5 rounded">TM/HM</span>`;
+                } else {
+                    methodBadge = `<span class="text-[9px] bg-gray-800 border border-gray-600 text-gray-300 px-1 py-0.5 rounded capitalize">${method}</span>`;
+                }
+
+                const moveCard = document.createElement('div');
+                moveCard.className = 'bg-black/40 border border-teto-border/30 p-2 rounded flex items-center justify-between text-xs';
+                
+                moveCard.innerHTML = `
+                    <span class="capitalize text-gray-200 font-semibold truncate mr-2 text-[11px]">${moveName}</span>
+                    ${methodBadge}
+                `;
+
+                container.appendChild(moveCard);
+            });
+        }
+
+        function switchTab(tab) {
+            const statsTab = document.getElementById('tab-stats');
+            const movesTab = document.getElementById('tab-moves');
+            const statsBtn = document.getElementById('tab-stats-btn');
+            const movesBtn = document.getElementById('tab-moves-btn');
+
+            if (tab === 'stats') {
+                statsTab.classList.remove('hidden');
+                movesTab.classList.add('hidden');
+                statsBtn.className = "flex-1 py-2 font-orbitron text-xs sm:text-sm font-bold border-b-2 border-teto-red text-teto-red";
+                movesBtn.className = "flex-1 py-2 font-orbitron text-xs sm:text-sm font-bold border-b-2 border-transparent text-gray-400";
+            } else {
+                statsTab.classList.add('hidden');
+                movesTab.classList.remove('hidden');
+                statsBtn.className = "flex-1 py-2 font-orbitron text-xs sm:text-sm font-bold border-b-2 border-transparent text-gray-400";
+                movesBtn.className = "flex-1 py-2 font-orbitron text-xs sm:text-sm font-bold border-b-2 border-teto-red text-teto-red";
+            }
+        }
+
+        function closeModal() {
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+            document.body.style.overflow = 'auto';
+        }
+    </script>
+</body>
+</html>
+```
